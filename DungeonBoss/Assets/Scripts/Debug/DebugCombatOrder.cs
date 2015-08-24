@@ -5,6 +5,7 @@ public class DebugCombatOrder : MonoBehaviour
 {
 	public CombatManager Combat;
 	public EventManager Events;
+	private int[] NumTurnsPerCharacter;
 
 	void Start()
 	{
@@ -19,7 +20,7 @@ public class DebugCombatOrder : MonoBehaviour
 		GUILayout.Label("Character Initiatives:");
 		for (int i = 0; i < Combat.ManualCharacterArray.Length; i++)
 		{
-			GUILayout.Label(Combat.ManualCharacterArray[i].name + ": " + Combat.ManualCharacterArray[i].Initiative);
+			GUILayout.Label(Combat.ManualCharacterArray[i].name + ": " + Combat.ManualCharacterArray[i].TurnsGiven);
 		}
 
 		GUILayout.Label("Upcoming Turns:");

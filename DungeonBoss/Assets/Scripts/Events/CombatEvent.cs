@@ -21,6 +21,11 @@ public abstract class CombatEvent
 			handler(_event);
 	}
 
+	protected EventManager EventManager
+	{
+		get { return GameObject.FindObjectOfType<EventManager>(); }
+	}
+
 	public abstract void Init();
 
 	// Update is called once per frame

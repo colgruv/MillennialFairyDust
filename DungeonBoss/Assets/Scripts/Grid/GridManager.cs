@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour 
@@ -13,6 +14,9 @@ public class GridManager : MonoBehaviour
 	public int MaxHexes;
 	public float GridSpacing;
 
+	[Header("Debug Attributes")]
+	public GridHex UniversalNPCTarget;
+
 	private List<GridHex> m_GridHexes;
 	public List<GridHex> GridHexes { get { return m_GridHexes; } }
 
@@ -20,6 +24,8 @@ public class GridManager : MonoBehaviour
 	void Awake () 
 	{
 		GenerateHexes();
+
+		Pathfinding.PathToHex(m_GridHexes[0], m_GridHexes[m_GridHexes.Count-1], 0);
 	}
 	
 	// Update is called once per frame
@@ -64,7 +70,7 @@ public class GridManager : MonoBehaviour
 
 		// Instantiate new Hex
 		GameObject newGridHexGO = GameObject.Instantiate(HexPrefab);
-		newGridHexGO.name = "Hex_" + _index.ToString();
+		newGridHexGO.name = "Hex_" + (_index+1).ToString();
 		newGridHexGO.transform.SetParent(HexCanvas.transform);
 		newGridHexGO.transform.localRotation = Quaternion.identity;
 		GridHex newGridHex = newGridHexGO.GetComponent<GridHex>();
@@ -78,5 +84,10 @@ public class GridManager : MonoBehaviour
 		{
 			hex.ProbeAdjacentHexes(m_GridHexes, GridSpacing);
 		}
+	}
+
+	public void OnUniversalNPCTargetClicked(GridHex _hexTarget)
+	{
+		UniversalNPCTarget = _hexTarget;
 	}
 }

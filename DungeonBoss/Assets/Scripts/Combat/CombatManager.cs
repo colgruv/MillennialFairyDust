@@ -10,7 +10,7 @@ public class CombatManager : MonoBehaviour
 	public List<CombatCharacterController> PrecalculatedTurnOrder { get { return m_PrecalculatedTurnOrder; } }
 
 	private int[] savedInitiatives;
-	public const int BASE_SPEED = 20;
+	public const int BASE_SPEED = 100;
 
 	private GridManager m_GridManager;
 
@@ -18,7 +18,7 @@ public class CombatManager : MonoBehaviour
 
 	void Awake()
 	{
-		Debug.Log("CombatManager::Start()");
+		//Debug.Log("CombatManager::Start()");
 
 		m_CombatCharacters = new List<CombatCharacterController>();
 		for (int i = 0; i < ManualCharacterArray.Length; i++)
@@ -38,17 +38,17 @@ public class CombatManager : MonoBehaviour
 
 	void OnEnable()
 	{
-		CombatEvent.EventComplete += CalculateTurnOrder;
+		//CombatEvent.EventComplete += CalculateTurnOrder;
 	}
 	
 	void OnDisable()
 	{
-		CombatEvent.EventComplete -= CalculateTurnOrder;
+		//CombatEvent.EventComplete -= CalculateTurnOrder;
 	}
 
 	void CalculateTurnOrder()
 	{
-		Debug.Log("CalculateTurnOrder()");
+		//Debug.Log("CalculateTurnOrder()");
 
 		// Clear the turn order
 		m_PrecalculatedTurnOrder = new List<CombatCharacterController>();
@@ -91,6 +91,8 @@ public class CombatManager : MonoBehaviour
 				for (int iter_numCombatChars = 0; iter_numCombatChars < m_CombatCharacters.Count; iter_numCombatChars++)
 				{
 					m_CombatCharacters[iter_numCombatChars].Initiative -= 1000;
+
+					// TODO: Make a stage event happen.
 				}
 			}
 
@@ -103,12 +105,28 @@ public class CombatManager : MonoBehaviour
 		loadCharacterInitiatives();
 	}
 
-	public EnemyTurnEvent GetNextCharacterTurn()
+	public CharacterTurnEvent GetNextCharacterTurn()
 	{
-		Debug.Log("GetNextCharacterTurn()");
-		EnemyTurnEvent beginCharacterTurnEvent = new EnemyTurnEvent();
-		beginCharacterTurnEvent.Character = m_PrecalculatedTurnOrder[0];
-		return beginCharacterTurnEvent;
+		if (m_PrecalculatedTurnOrder[0].CharacterControlType == CombatCharacterController.ControlType.NPC)
+		{
+			EnemyTurnEvent beginCharacterTurnEvent = new EnemyTurnEvent();
+			beginCharacterTurnEvent.Character = m_PrecalculatedTurnOrder[0];
+			m_PrecalculatedTurnOrder[0].TurnsGiven++;
+			CalculateTurnOrder();
+			return beginCharacterTurnEvent;
+		}
+		else if (m_PrecalculatedTurnOrder[0].CharacterControlType == CombatCharacterController.ControlType.PC)
+		{
+			Debug.Log("Player turn.");
+
+			PlayerTurnEvent beginCharacterTurnEvent = new PlayerTurnEvent();
+			beginCharacterTurnEvent.Character = m_PrecalculatedTurnOrder[0];
+			m_PrecalculatedTurnOrder[0].TurnsGiven++;
+			CalculateTurnOrder();
+			return beginCharacterTurnEvent;
+		}
+		else
+			return null;
 	}
 
 	private void saveCharacterInitiatives()

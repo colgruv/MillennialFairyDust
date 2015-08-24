@@ -14,6 +14,7 @@ public class CombatCharacterController : MonoBehaviour
 	public int Movement;
 	public int Level;
 	public int MoveSpeed;
+	public int Size;
 	
 	// Maximum attributes
 	[Header("Scalable Attributes")]
@@ -22,6 +23,9 @@ public class CombatCharacterController : MonoBehaviour
 	public int Speed;
 	public int Defense;
 	public int Resistance;
+
+	[Header("Debug Attributes")]
+	public int TurnsGiven;
 	
 	// Current attributes (including loss and modification)
 	private int m_CurrentHP;

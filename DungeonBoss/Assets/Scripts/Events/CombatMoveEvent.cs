@@ -6,10 +6,8 @@ public class CombatMoveEvent : CombatActionEvent
 	public GridHex FinalTarget;
 
 	// TODO: Pathfinding
-	//private GridHex m_currentTarget; 
-
+	private GridHex m_currentTarget; 
 	private GridHex m_startingPoint;
-
 
 	// Use this for initialization
 	public override void Init() 
@@ -24,7 +22,7 @@ public class CombatMoveEvent : CombatActionEvent
 		Vector3 direction = Character.transform.localPosition * -1;
 
 		//Debug.Log(direction.magnitude);
-		if (direction.magnitude < 0.5f)
+		if (direction.magnitude <= 1.0f)
 		{
 			OnEventComplete();
 		}

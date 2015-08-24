@@ -3,8 +3,17 @@ using System.Collections.Generic;
 
 public class GridHex : MonoBehaviour 
 {
+	public const int CAPACITY = 6;
+
+	[Header("GameObject Pointers")]
 	// Adjacent hexes, array length 6, stored in counterclockwise order (i0 = upper right, i1 = top ... i5 = lower right)
 	public GridHex[] AdjacentHexes;
+	public GameObject[] EffectDecals;
+
+	[Header("Gameplay Flags")]
+	public bool IsNavigable = true;
+	private int m_FilledAmount = 0;
+	public int AvailableSpace { get { return CAPACITY - m_FilledAmount; } }
 	
 	private List<GridEffect> m_Effects;
 	public List<GridEffect> Effects { get { return m_Effects; } }
@@ -20,15 +29,16 @@ public class GridHex : MonoBehaviour
 	void Update()
 	{
 		DeclutterChildren();
+		DetermineFilledAmount();
 	}
 	
 	public void Place(GridHex _fromHex, int _adjIndex, float _spacing)
 	{
 		// Determine position offset
-		Debug.Log("Determining new hex placement.");
+		//Debug.Log("Determining new hex placement.");
 		Vector3 fromHexPosition = _fromHex.transform.position;
 		float placeTheta = 30f + (_adjIndex*60f);
-		Debug.Log("Place Theta: " + placeTheta);
+		//Debug.Log("Place Theta: " + placeTheta);
 		float placeThetaR = placeTheta * Mathf.PI / 180f;
 		Vector3 positionOffset = new Vector3(Mathf.Cos(placeThetaR)*_spacing, 0.0f, Mathf.Sin(placeThetaR)*_spacing);
 		transform.position = fromHexPosition + positionOffset;
@@ -71,10 +81,10 @@ public class GridHex : MonoBehaviour
 			{
 				if ((_hexes[j].transform.position - adjacentPosition).magnitude < (_spacing/2))
 				{
-					Debug.Log("Found adjacent hex.");
+					//Debug.Log("Found adjacent hex.");
 					AdjacentHexes[i] = _hexes[j];
 					hexFound = true;
-					Debug.Log("Adjacent hex set: " + AdjacentHexes[i].name);
+					//Debug.Log("Adjacent hex set: " + AdjacentHexes[i].name);
 				}
 			}
 			if (!hexFound)
@@ -131,6 +141,16 @@ public class GridHex : MonoBehaviour
 					                                            characterControllers[i].MoveSpeed *
 					                                            Time.deltaTime);
 			}
+		}
+	}
+
+	private void DetermineFilledAmount()
+	{
+		CombatCharacterController[] characterControllers = GetComponentsInChildren<CombatCharacterController>();
+		m_FilledAmount = 0;
+		for (int i = 0; i < characterControllers.Length; i++)
+		{
+			m_FilledAmount += characterControllers[i].Size;
 		}
 	}
 }

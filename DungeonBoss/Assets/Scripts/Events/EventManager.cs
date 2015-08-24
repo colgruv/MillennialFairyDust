@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 /// <summary>
@@ -14,9 +15,25 @@ public class EventManager : MonoBehaviour
 	public CombatEvent CurrentEvent { get { return m_CurrentCombatEvent; } }
 	private CombatEvent m_PriorityEvent;
 
+	public enum UIAction
+	{
+		NONE,
+		ATTACK,
+		MOVE
+	};
+	private UIAction m_CurrentUIAction;
+	public UIAction CurrentUIAction 
+	{ 
+		get { return m_CurrentUIAction; } 
+		set { m_CurrentUIAction = value; }
+	}
+
+	private GridHex m_SelectedHex;
+	public GridHex SelectedHex { get { return m_SelectedHex; } }
+
 	void Awake()
 	{
-		Debug.Log("EventManager::Start()");
+		//Debug.Log("EventManager::Start()");
 		m_QueuedEvents = new Queue<CombatEvent>();
 		m_CombatManager = GetComponent<CombatManager>();
 	}
@@ -36,9 +53,7 @@ public class EventManager : MonoBehaviour
 	void Update()
 	{
 		if (m_CurrentCombatEvent == null)
-		{ // If there are no events (first update) get an event from the combat manager.
-			// This should not happen after the first update.
-			//Debug.Log("Getting first event");
+		{
 			GetNextEvent();
 		}
 		else
@@ -48,9 +63,14 @@ public class EventManager : MonoBehaviour
 		}
 	}
 
-	void GetNextEvent()
+	public void OnEventComplete()
 	{
-		Debug.Log("GetNextEvent()");
+		m_CurrentCombatEvent = null;
+	}
+
+	public void GetNextEvent()
+	{
+		//Debug.Log("GetNextEvent()");
 		if (m_PriorityEvent != null) 
 		{
 			m_CurrentCombatEvent = m_PriorityEvent;
@@ -83,8 +103,18 @@ public class EventManager : MonoBehaviour
 	public void QueuePriorityEvent(CombatEvent _combatEvent)
 	{
 		if (m_PriorityEvent != null) 
-			Debug.LogWarning("Overwriting previous priority event.");
+			//Debug.LogWarning("Overwriting previous priority event.");
 
 		m_PriorityEvent = _combatEvent;
+	}
+
+	public void SetUIAction(ActionButton _button)
+	{
+		m_CurrentUIAction = _button.Action;
+	}
+
+	public void SetSelectedHex(GridHex _newHex)
+	{
+		m_SelectedHex = _newHex;
 	}
 }
