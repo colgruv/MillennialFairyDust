@@ -12,6 +12,8 @@ public class CombatMoveEvent : CombatActionEvent
 	// Use this for initialization
 	public override void Init() 
 	{
+		//Vector3 direction = (FinalTarget.transform.position - Character.transform.position).normalized;
+		//Character.transform.up = direction;
 		m_startingPoint = Character.transform.parent.gameObject.GetComponent<GridHex>();
 		Character.transform.SetParent(FinalTarget.transform);
 	}

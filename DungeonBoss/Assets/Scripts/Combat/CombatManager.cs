@@ -150,10 +150,35 @@ public class CombatManager : MonoBehaviour
 	{
 		for (int i = 0; i < m_CombatCharacters.Count; i++)
 		{
-			int placeIndex = Random.Range(0, m_GridManager.GridHexes.Count - 1);
-			m_CombatCharacters[i].transform.SetParent(m_GridManager.GridHexes[placeIndex].transform);
-			m_CombatCharacters[i].transform.localPosition = Vector3.zero;
-			m_CombatCharacters[i].transform.localRotation = Quaternion.identity;
+			if (m_CombatCharacters[i].CharacterControlType == CombatCharacterController.ControlType.PC)
+			{
+				m_CombatCharacters[i].transform.SetParent(m_GridManager.GridHexes[0].transform);
+				m_CombatCharacters[i].transform.localPosition = Vector3.zero;
+				m_CombatCharacters[i].transform.localRotation = Quaternion.identity;
+			}
+			else
+			{
+				int placeIndex = Random.Range(1, m_GridManager.GridHexes.Count - 1);
+				m_CombatCharacters[i].transform.SetParent(m_GridManager.GridHexes[placeIndex].transform);
+				m_CombatCharacters[i].transform.localPosition = Vector3.zero;
+				m_CombatCharacters[i].transform.localRotation = Quaternion.identity;
+			}
 		}
+	}
+
+	private void placeEffectsRandomly()
+	{
+		for (int i = 0; i < m_GridManager.GridHexes.Count; i++)
+		{
+			if (i % 5 == 0)
+			{
+				//m_GridManager.GridHexes[i].ef
+			}
+		}
+	}
+
+	private void placeNewEffect()
+	{
+
 	}
 }

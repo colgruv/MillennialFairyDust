@@ -22,29 +22,47 @@ public class PromptTargetEvent : CombatPromptEvent
 			Debug.Log("Selected HEX detected.");
 
 			GridHex characterHex = Character.transform.parent.GetComponent<GridHex>();
-			int distanceToHex = Pathfinding.PathToHex(characterHex, EventManager.SelectedHex, Character.Size).Count - 1;
-			Debug.Log("Distance to selected hex: " + distanceToHex);
+			Debug.Log("Character Hex: " + characterHex);
+			int distanceToHex;
 
-			if (distanceToHex == Character.Movement)
+			switch(Action)
 			{
-				switch(Action)
+			case EventManager.UIAction.MOVE:
+				distanceToHex = Pathfinding.PathToHex(characterHex, EventManager.SelectedHex, Character.Size).Count - 1;
+
+				if (distanceToHex == 1)
 				{
-				case EventManager.UIAction.MOVE:
 					CombatMoveEvent moveEvent = new CombatMoveEvent();
 					moveEvent.Character = Character;
 					moveEvent.FinalTarget = EventManager.SelectedHex;
 					OnQueueEvent(moveEvent);
-					break;
-				case EventManager.UIAction.ATTACK:
-					Debug.Log("Attack not implemented yet.");
-					break;
 				}
 
 				OnEventComplete();
+				Debug.Log("PromptTargetEvent complete");
+				break;
+			case EventManager.UIAction.ATTACK:
+				distanceToHex = Pathfinding.PathToHex(characterHex, EventManager.SelectedHex, 0).Count - 1;
+
+				if (distanceToHex == 1)
+				{
+					Debug.Log("CombatAttackEvent Triggered.");
+					CombatAttackEvent attackEvent = new CombatAttackEvent();
+					attackEvent.Character = Character;
+					attackEvent.Target = EventManager.SelectedHex;
+					OnQueueEvent(attackEvent);
+					Debug.Log("CombatAttackEvent Queued");
+				}
+
+				OnEventComplete();
+				Debug.Log("PromptTargetEvent complete");
+				break;
 			}
 
 			EventManager.SetSelectedHex(null);
 			GetPanel("UI_PromptTarget").gameObject.SetActive(true);
+
+			Debug.Log("EndProcess PromptTargetEvent()");
 		}
 	}
 }

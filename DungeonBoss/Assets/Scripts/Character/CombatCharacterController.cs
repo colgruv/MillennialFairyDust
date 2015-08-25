@@ -37,4 +37,9 @@ public class CombatCharacterController : MonoBehaviour
 	// Simulation variables
 	private int m_Initiative;
 	public int Initiative { get { return m_Initiative; } set { m_Initiative = value; } }
+
+	void Start()
+	{
+		GetComponent<Animator>().Play("Character_Idle");
+	}
 }
