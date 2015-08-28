@@ -5,22 +5,38 @@ public class GridHex : MonoBehaviour
 {
 	public const int CAPACITY = 6;
 
+	public enum Effect
+	{
+		FIRE,
+		FROST,
+		LIGHTNING,
+		EARTH,
+		DEFEND,
+		BARRIER
+	};
+
+	private Dictionary<Effect,bool> m_EffectsActive;
+	public Dictionary<Effect,bool> ActiveEffects { get { return m_EffectsActive; } }
+
+	private List<CombatCharacterController> m_Characters;
+	public List<CombatCharacterController> Characters { get { return m_Characters; } }
+
 	[Header("GameObject Pointers")]
 	// Adjacent hexes, array length 6, stored in counterclockwise order (i0 = upper right, i1 = top ... i5 = lower right)
 	public GridHex[] AdjacentHexes;
-	public GameObject[] EffectDecals;
+	//public GameObject[] EffectDecals;
+	public GridHexEffect[] EffectChildren;
 
 	[Header("Gameplay Flags")]
 	public bool IsNavigable = true;
 	private int m_FilledAmount = 0;
 	public int AvailableSpace { get { return CAPACITY - m_FilledAmount; } }
-	
-	private List<GridEffect> m_Effects;
-	public List<GridEffect> Effects { get { return m_Effects; } }
-	
-	private List<CombatCharacterController> m_Characters;
-	public List<CombatCharacterController> Characters { get { return m_Characters; } }
-	
+
+	void Awake()
+	{
+		InitEffects();
+	}
+
 	void Start()
 	{
 		//AdjacentHexes = new GridHex[6];
@@ -104,6 +120,44 @@ public class GridHex : MonoBehaviour
 		}
 		return true;
 	}
+
+	public bool AddEffect(Effect _effect)
+	{
+		if (!m_EffectsActive[_effect])
+		{
+			m_EffectsActive[_effect] = true;
+			foreach(GridHexEffect gridHexEffect in EffectChildren)
+			{
+				if (gridHexEffect.Effect == _effect)
+					gridHexEffect.gameObject.SetActive(true);
+			}
+			return true;
+		}
+		else
+		{
+			Debug.LogWarning("Attempted to add effect that was already active: " + _effect);
+			return false;
+		}
+	}
+
+	public bool RemoveEffect(Effect _effect)
+	{
+		if (m_EffectsActive[_effect])
+		{
+			m_EffectsActive[_effect] = false;
+			foreach(GridHexEffect gridHexEffect in EffectChildren)
+			{
+				if (gridHexEffect.Effect == _effect)
+					gridHexEffect.gameObject.SetActive(false);
+			}
+			return true;
+		}
+		else
+		{
+			Debug.LogWarning("Attempted to remove effect that was not active: " + _effect);
+			return false;
+		}
+	}
 	
 	private void DeclutterChildren()
 	{
@@ -151,6 +205,15 @@ public class GridHex : MonoBehaviour
 		for (int i = 0; i < characterControllers.Length; i++)
 		{
 			m_FilledAmount += characterControllers[i].Size;
+		}
+	}
+
+	private void InitEffects()
+	{
+		m_EffectsActive = new Dictionary<Effect, bool>();
+		foreach(GridHexEffect gridHexEffect in EffectChildren)
+		{
+			m_EffectsActive.Add(gridHexEffect.Effect, false);
 		}
 	}
 }

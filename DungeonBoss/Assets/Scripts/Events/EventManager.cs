@@ -8,7 +8,28 @@ using System.Collections.Generic;
 /// </summary>
 public class EventManager : MonoBehaviour 
 {
-	private Queue<CombatEvent> m_QueuedEvents;
+	// Singleton interface
+	private static EventManager _instance;
+	public static EventManager Instance
+	{
+		get
+		{
+			if (!_instance)
+			{
+				_instance = (EventManager)GameObject.FindObjectOfType(typeof(EventManager));
+				if (!_instance)
+				{
+					GameObject container = new GameObject();
+					container.name = "_MainObject";
+					_instance = container.AddComponent(typeof(EventManager)) as EventManager;
+				}
+			}
+			
+			return _instance;
+		}
+	}
+
+	private Queue<CombatEvent> m_EventQueue;
 	private CombatManager m_CombatManager;
 
 	private CombatEvent m_CurrentCombatEvent;
@@ -34,7 +55,7 @@ public class EventManager : MonoBehaviour
 	void Awake()
 	{
 		//Debug.Log("EventManager::Start()");
-		m_QueuedEvents = new Queue<CombatEvent>();
+		m_EventQueue = new Queue<CombatEvent>();
 		m_CombatManager = GetComponent<CombatManager>();
 	}
 
@@ -76,9 +97,9 @@ public class EventManager : MonoBehaviour
 			m_CurrentCombatEvent = m_PriorityEvent;
 			m_PriorityEvent = null;
 		} 
-		else if (m_QueuedEvents.Count > 0)
+		else if (m_EventQueue.Count > 0)
 		{
-			m_CurrentCombatEvent = m_QueuedEvents.Dequeue();
+			m_CurrentCombatEvent = m_EventQueue.Dequeue();
 		}
 		else
 		{
@@ -91,7 +112,7 @@ public class EventManager : MonoBehaviour
 	
 	public void QueueEvent(CombatEvent _combatEvent)
 	{
-		m_QueuedEvents.Enqueue(_combatEvent);
+		m_EventQueue.Enqueue(_combatEvent);
 	}
 
 

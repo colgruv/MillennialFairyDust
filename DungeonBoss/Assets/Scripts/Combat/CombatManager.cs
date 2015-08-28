@@ -10,7 +10,9 @@ public class CombatManager : MonoBehaviour
 	public List<CombatCharacterController> PrecalculatedTurnOrder { get { return m_PrecalculatedTurnOrder; } }
 
 	private int[] savedInitiatives;
-	public const int BASE_SPEED = 100;
+	private int m_baseSpeed = 0;
+	private int m_numTurns = 0;
+	public int StageEffectInterval = 5;
 
 	private GridManager m_GridManager;
 
@@ -34,6 +36,8 @@ public class CombatManager : MonoBehaviour
 	void Start()
 	{
 		placeCharactersRandomly();
+		calculateBaseSpeed();
+		placeEffectsRandomly();
 	}
 
 	void OnEnable()
@@ -76,7 +80,7 @@ public class CombatManager : MonoBehaviour
 			for (int iter_numCombatChars = 0; iter_numCombatChars < m_CombatCharacters.Count; iter_numCombatChars++)
 			{
 				if (iter_numCombatChars == highestInitiativeIndex)
-					m_CombatCharacters[iter_numCombatChars].Initiative -= BASE_SPEED;
+					m_CombatCharacters[iter_numCombatChars].Initiative -= m_baseSpeed;
 
 				m_CombatCharacters[iter_numCombatChars].Initiative += m_CombatCharacters[iter_numCombatChars].Speed;
 
@@ -107,6 +111,8 @@ public class CombatManager : MonoBehaviour
 
 	public CharacterTurnEvent GetNextCharacterTurn()
 	{
+
+
 		if (m_PrecalculatedTurnOrder[0].CharacterControlType == CombatCharacterController.ControlType.NPC)
 		{
 			EnemyTurnEvent beginCharacterTurnEvent = new EnemyTurnEvent();
@@ -166,14 +172,26 @@ public class CombatManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Places the effects randomly.
+	/// </summary>
 	private void placeEffectsRandomly()
 	{
 		for (int i = 0; i < m_GridManager.GridHexes.Count; i++)
 		{
-			if (i % 5 == 0)
+			if (i % 10 == 0)
 			{
-				//m_GridManager.GridHexes[i].ef
+				m_GridManager.GridHexes[i].AddEffect(GridHex.Effect.FIRE);
 			}
+		}
+	}
+
+	private void calculateBaseSpeed()
+	{
+		m_baseSpeed = 0;
+		for (int i = 0; i < m_CombatCharacters.Count; i++)
+		{
+			m_baseSpeed += m_CombatCharacters[i].Speed;
 		}
 	}
 
